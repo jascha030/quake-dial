@@ -1,12 +1,10 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "QuakeDial",
-  "identifier": "com.quakedial.app",
+  "productName": "quakedial",
   "version": "0.1.0",
+  "identifier": "com.jascha030.quakedial",
   "build": {
-    "beforeDevCommand": "",
-    "beforeBuildCommand": "",
-    "frontendDist": "../dist"
+    "frontendDist": "../src"
   },
   "app": {
     "withGlobalTauri": false,
