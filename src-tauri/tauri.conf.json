@@ -17,7 +17,7 @@
       "iconPath": "icons/icon.png",
       "iconAsTemplate": true,
       "id": "main",
-      "tooltip": "Quake Terminal"
+      "tooltip": "QuakeDial"
     }
   },
   "bundle": {
