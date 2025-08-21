@@ -1,29 +1,28 @@
 use tauri::menu::{Menu, MenuItem};
-use tauri::tray::TrayIconBuilder;
-use tauri::App;
+use tauri::tray::{TrayIcon, TrayIconBuilder};
+use tauri::{AppHandle, RunEvent};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .setup({
-            move |app| {
-                if let Err(e) = setup_tray(app) {
-                    eprintln!("Failed to set up tray: {e}");
-                }
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
 
-                Ok(())
-            }
-        })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+    let _tray = setup_tray(app.handle()).expect("Failed to set up tray");
+
+    app.run(|_app_handle, event| {
+        if let RunEvent::ExitRequested { api, .. } = event {
+            api.prevent_exit();
+        }
+    });
 }
 
-fn setup_tray(app: &App) -> tauri::Result<()> {
+fn setup_tray(app: &AppHandle) -> tauri::Result<TrayIcon> {
     let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
     let menu = Menu::with_items(app, &[&quit_i])?;
 
-    let _tray = TrayIconBuilder::new()
+    TrayIconBuilder::new()
         .on_menu_event(|app, event| match event.id.as_ref() {
             "quit" => {
                 app.exit(0);
@@ -34,7 +33,6 @@ fn setup_tray(app: &App) -> tauri::Result<()> {
         })
         .menu(&menu)
         // .icon(app.default_window_icon().unwrap().clone())
-        .build(app)?;
-
-    Ok(())
+        .build(app)
 }
+
